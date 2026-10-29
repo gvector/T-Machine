@@ -30,11 +30,12 @@ Validation errors (shown in the editor with line number; the last valid machine 
 - missing/invalid required keys (`start_state`, `rules`, ...)
 - symbols other than `0`/`1` in `tape`, `read`, `write`
 - `move` not in `left|right|stay`
-- `next` / `start_state` / `halt_states` referring to unknown states
+- `next` / `start_state` referring to a state that has no rules and is not a halt state
+- unknown keys (catches typos)
 - duplicate rule for the same (state, read)
 
 ## Screen
-- **State diagram** (top): each state a colorful ball; current state glows; halt states marked; arrows labeled `read→write, move`; last fired arrow lights up; balls draggable; automatic initial layout.
+- **State diagram** (top): each state a colorful ball; current state glows; halt states marked; arrows labeled `read→write, move`; last fired arrow lights up; balls draggable; automatic layout that routes arrows around balls (flows left→right in wide views, top→bottom in tall ones); "Tidy up" restores it after dragging.
 - **Status line**: current state, step counter, status (ready / running / paused / halted / stuck / step limit reached).
 - **Tape** (bottom): black/white tiles, ~25 visible, view follows the head and slides smoothly; head marker; position ruler (…, -1, 0, 1, …).
 - **Controls**: Step, Run/Pause, speed slider, Step back (full history), Reset, step-limit field.
