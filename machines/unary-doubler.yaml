@@ -1,0 +1,28 @@
+# Doubles a unary number: 111 -> 111111.
+# The input is eaten from the left, one 1 at a time,
+# and for every 1 eaten, two 1s are added to the output
+# that grows to the right of a one-tile gap.
+name: Unary doubler
+description: Doubles a unary number (111 → 111111), building the result to the right.
+tape: "111"
+start_state: eat
+start_position: 0
+halt_states: [done]
+
+rules:
+  # eat the leftmost input 1 (or stop when the input is gone)
+  - { state: eat,       read: 1, write: 0, move: right, next: to_gap }
+  - { state: eat,       read: 0, write: 0, move: stay,  next: done }
+  # walk right over what's left of the input, then cross the gap
+  - { state: to_gap,    read: 1, write: 1, move: right, next: to_gap }
+  - { state: to_gap,    read: 0, write: 0, move: right, next: to_end }
+  # walk to the end of the output and write two 1s
+  - { state: to_end,    read: 1, write: 1, move: right, next: to_end }
+  - { state: to_end,    read: 0, write: 1, move: right, next: second }
+  - { state: second,    read: 0, write: 1, move: left,  next: back_out }
+  # walk back over the output to the gap...
+  - { state: back_out,  read: 1, write: 1, move: left,  next: back_out }
+  - { state: back_out,  read: 0, write: 0, move: left,  next: back_in }
+  # ...then over the input to its left edge
+  - { state: back_in,   read: 1, write: 1, move: left,  next: back_in }
+  - { state: back_in,   read: 0, write: 0, move: right, next: eat }

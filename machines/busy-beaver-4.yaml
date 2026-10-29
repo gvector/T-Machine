@@ -1,0 +1,17 @@
+# The 4-state Busy Beaver champion.
+name: Busy Beaver (4 states)
+description: Starts on a blank tape, writes thirteen 1s in 107 steps, then halts.
+tape: ""
+start_state: A
+start_position: 0
+halt_states: [H]
+
+rules:
+  - { state: A, read: 0, write: 1, move: right, next: B }
+  - { state: A, read: 1, write: 1, move: left,  next: B }
+  - { state: B, read: 0, write: 1, move: left,  next: A }
+  - { state: B, read: 1, write: 0, move: left,  next: C }
+  - { state: C, read: 0, write: 1, move: right, next: H }
+  - { state: C, read: 1, write: 1, move: left,  next: D }
+  - { state: D, read: 0, write: 1, move: right, next: D }
+  - { state: D, read: 1, write: 0, move: right, next: A }

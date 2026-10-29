@@ -1,0 +1,20 @@
+# Numbers are written in unary: 3 is 111, 2 is 11.
+# Two numbers are separated by a single 0.
+#   111 0 11   ->   11111      (3 + 2 = 5)
+# Idea: fill the gap with a 1, then erase the last 1.
+name: Unary addition
+description: Adds two unary numbers separated by a 0 (111 0 11 → 11111).
+tape: "111 0 11"
+start_state: first
+start_position: 0
+halt_states: [done]
+
+rules:
+  # walk over the first number; fill the gap with a 1
+  - { state: first,  read: 1, write: 1, move: right, next: first }
+  - { state: first,  read: 0, write: 1, move: right, next: second }
+  # walk over the second number until the end
+  - { state: second, read: 1, write: 1, move: right, next: second }
+  - { state: second, read: 0, write: 0, move: left,  next: trim }
+  # we added one 1 too many: erase the last one
+  - { state: trim,   read: 1, write: 0, move: stay,  next: done }

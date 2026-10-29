@@ -1,0 +1,16 @@
+# The 3-state Busy Beaver: starting from an all-white tape,
+# no 3-state machine writes more 1s and still halts.
+name: Busy Beaver (3 states)
+description: Starts on a blank tape, writes six 1s in 14 steps, then halts.
+tape: ""
+start_state: A
+start_position: 0
+halt_states: [H]
+
+rules:
+  - { state: A, read: 0, write: 1, move: right, next: B }
+  - { state: A, read: 1, write: 1, move: right, next: H }
+  - { state: B, read: 0, write: 0, move: right, next: C }
+  - { state: B, read: 1, write: 1, move: right, next: B }
+  - { state: C, read: 0, write: 1, move: left,  next: C }
+  - { state: C, read: 1, write: 1, move: left,  next: A }
