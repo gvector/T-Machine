@@ -38,7 +38,7 @@ export default function App() {
   const [machine, setMachine] = useState(() => firstMachine(text))
   const [tapeText, setTapeText] = useState('')
   const [limitText, setLimitText] = useState(String(machine.maxSteps))
-  const [speed, setSpeed] = useState(() => storedInt('speed', 25, 0, 100))
+  const [speed, setSpeed] = useState(() => storedInt('speed', 0, 0, 100))
   const [learnOpen, setLearnOpen] = useState(() => storage.get('learnOpen') !== 'false')
   const [page, setPage] = useState(() => storedInt('page', 0, 0, Number.MAX_SAFE_INTEGER))
   const fileInput = useRef<HTMLInputElement>(null)
