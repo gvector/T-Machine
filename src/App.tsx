@@ -26,15 +26,21 @@ function firstMachine(text: string): Machine {
   return fallback.machine
 }
 
+/** A whole number from storage, falling back when it's missing, garbled or out of range. */
+function storedInt(key: string, fallback: number, min: number, max: number): number {
+  const n = Number(storage.get(key) ?? fallback)
+  return Number.isInteger(n) ? Math.min(max, Math.max(min, n)) : fallback
+}
+
 export default function App() {
   const [source, setSource] = useState(() => storage.get('source') ?? DEFAULT_ID)
   const [text, setText] = useState(() => storage.get('text') ?? findBundled(DEFAULT_ID)?.text ?? bundled[0].text)
   const [machine, setMachine] = useState(() => firstMachine(text))
   const [tapeText, setTapeText] = useState('')
   const [limitText, setLimitText] = useState(String(machine.maxSteps))
-  const [speed, setSpeed] = useState(() => Number(storage.get('speed') ?? 25))
+  const [speed, setSpeed] = useState(() => storedInt('speed', 25, 0, 100))
   const [learnOpen, setLearnOpen] = useState(() => storage.get('learnOpen') !== 'false')
-  const [page, setPage] = useState(() => Number(storage.get('page') ?? 0))
+  const [page, setPage] = useState(() => storedInt('page', 0, 0, Number.MAX_SAFE_INTEGER))
   const fileInput = useRef<HTMLInputElement>(null)
 
   const parsed = useMemo(() => parseMachine(text), [text])
@@ -58,10 +64,14 @@ export default function App() {
   const colors = useMemo(() => stateColors(machine), [machine])
   const color = colors.get(run.state) ?? '#fff'
 
+  /** Loading always starts fresh: step 0, the file's own tape and step limit (even when the text is unchanged). */
   const loadText = (next: string, id: string) => {
+    const loaded = parseMachine(next)
     setText(next)
     setSource(id)
     setTapeText('')
+    if (loaded.ok) setLimitText(String(loaded.machine.maxSteps))
+    sim.reset()
   }
   const loadBundled = (id: string) => {
     const m = findBundled(id)
@@ -79,7 +89,8 @@ export default function App() {
     a.href = url
     a.download = name
     a.click()
-    URL.revokeObjectURL(url)
+    // revoking right away can cancel the download in some browsers
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
   const original = findBundled(source)?.text
@@ -93,6 +104,8 @@ export default function App() {
       const t = e.target as HTMLElement
       if (t.closest('input, textarea, select, [contenteditable="true"]') || e.metaKey || e.ctrlKey || e.altKey) return
       const s = simRef.current
+      // Space on a focused button presses that button, as usual
+      if (e.key === ' ' && t.closest('button, a[href], [role="button"]')) return
       if (e.key === ' ') { e.preventDefault(); s.togglePlay() }
       else if (e.key === 'ArrowRight') { e.preventDefault(); s.step() }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); s.stepBack() }

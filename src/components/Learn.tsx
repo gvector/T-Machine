@@ -159,8 +159,10 @@ interface Props {
   editorText: string
 }
 
-export function Learn({ page, onPage, onClose, onLoadMachine, onLoadText, editorText }: Props) {
-  const p = PAGES[Math.min(page, PAGES.length - 1)]
+export function Learn({ page: wanted, onPage, onClose, onLoadMachine, onLoadText, editorText }: Props) {
+  // a page saved by an older version may no longer exist
+  const page = Math.min(Math.max(0, wanted), PAGES.length - 1)
+  const p = PAGES[page]
   const lessons = Math.max(...PAGES.map(x => x.lesson))
   const [check, setCheck] = useState<string | null>(null)
   const [showSolution, setShowSolution] = useState(false)
@@ -233,7 +235,10 @@ function Spotlight({ target }: { target?: string }) {
     if (!target) { setRect(null); return }
     const measure = () => {
       const el = document.querySelector(`[data-tour="${target}"]`)
-      setRect(el ? el.getBoundingClientRect() : null)
+      const next = el ? el.getBoundingClientRect() : null
+      // keep the old object when nothing moved, so polling doesn't re-render
+      setRect(prev => prev && next && prev.top === next.top && prev.left === next.left
+        && prev.width === next.width && prev.height === next.height ? prev : next)
     }
     measure()
     const id = window.setInterval(measure, 400) // panels resize and scroll; cheap enough to poll

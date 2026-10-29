@@ -333,7 +333,8 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; padding: 0 5px; b
   flex: none;
   width: 44px;
   overflow: hidden;
-  padding: 14px 0;
+  /* extra bottom room so it can scroll as far as the textarea when that has a horizontal scrollbar */
+  padding: 14px 0 44px;
   text-align: right;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 12px;

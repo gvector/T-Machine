@@ -32,6 +32,9 @@ export function useSimulator(machine: Machine, input: Bit[], limit: number, spee
 
   const rate = stepsPerSecond(speed)
   const animated = rate <= ANIMATED_MAX_RATE
+  // Read by the running loop, so moving the slider changes pace without restarting it (and taking an extra step).
+  const pace = useRef({ rate, animated })
+  pace.current = { rate, animated }
 
   useEffect(() => {
     if (!playing) return
@@ -40,6 +43,7 @@ export function useSimulator(machine: Machine, input: Bit[], limit: number, spee
     let lastDraw = last
     let budget = 1 // take the first step right away
     const loop = (now: number) => {
+      const { rate, animated } = pace.current
       budget = Math.min(budget + ((now - last) / 1000) * rate, 50_000)
       last = now
       let moved = false
@@ -60,7 +64,7 @@ export function useSimulator(machine: Machine, input: Bit[], limit: number, spee
     }
     frame = requestAnimationFrame(loop)
     return () => { cancelAnimationFrame(frame); redraw() }
-  }, [playing, rate, animated, redraw])
+  }, [playing, redraw])
 
   const step = useCallback(() => {
     setPlaying(false)
